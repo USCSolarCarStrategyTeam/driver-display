@@ -13,10 +13,15 @@ c = Driver(DummyRPMDriver())
 d = Driver(Dummy2RPMDriver())
 
 root = Tk()
-root["bg"] = "black"
-root.overrideredirect(True)
-root.overrideredirect(False)
-root.attributes('-fullscreen',True)
+#root["bg"] = "black"
+#root.overrideredirect(True)
+#root.overrideredirect(False)
+#root.attributes('-fullscreen',True)
+logo = PhotoImage(file="telemetry-pi/connected.pgm")
+w1 = Label(root, image=logo)
+w1.pack()
+root.mainloop()
+
 
 def total():
     threading.Timer(5.0, total).start()
@@ -25,7 +30,7 @@ def total():
     g = Label(root, text = d.getRPM(), fg="white", bg="black")
     g.pack()
     root.mainloop()
-total()
+# total()
 
 
 
