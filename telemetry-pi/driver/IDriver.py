@@ -8,6 +8,9 @@ class IInterface:
     @abstractmethod
     def getRPM(self): raise NotImplementedError
 
+    @abstractmethod
+    def getConnection(self): raise NotImplementedError
+
 
 
 

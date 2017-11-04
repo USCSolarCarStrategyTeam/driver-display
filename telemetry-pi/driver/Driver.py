@@ -12,6 +12,7 @@ class Driver(IInterface):
 
     def getRPM(self): return(self.RPMDriver.getRPM())
     def getBatteryTemperature(self,index): print (index)
+    def getConnection(self): return(self.RPMDriver.getConnection())
 
 class DummyRPMDriver():
 
@@ -22,3 +23,9 @@ class DummyRPMDriver():
 class Dummy2RPMDriver():
 
     def getRPM(self): return 2;
+
+class DummyConnectedDriver():
+
+    def getConnection(self):
+
+        return randint(0, 1);
