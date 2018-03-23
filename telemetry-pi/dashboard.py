@@ -1,176 +1,216 @@
+from PyQt5.QtWidgets import (QWidget, QPushButton, QFrame,
+                             QColorDialog, QApplication, QLabel, QDesktopWidget)
+from PyQt5.QtGui import QColor, QPainter, QFont, QPixmap
+from PyQt5.QtCore import Qt, QTime, QTimer
 import sys
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel
-from PyQt5.QtCore import QTimer, QTime
 from random import randint
 
+
 class Dashboard(QWidget):
-    mph = 35
-    range = 40
-    battery = 100
-    temp = 80
-    motorCurr = 60
-    power = 60
 
     def __init__(self):
-        super().__init__()
+        super(Dashboard, self).__init__()
+
         self.initUI()
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.setSpeed)
-        self.timer.timeout.connect(self.setRange)
-        self.timer.timeout.connect(self.setBatt)
-        self.timer.timeout.connect(self.setTemp)
-        self.timer.timeout.connect(self.setMotor)
-        self.timer.timeout.connect(self.setPower)
+        self.timer.timeout.connect(self.getSpeed)
+        self.timer.timeout.connect(self.getRange)
+        self.timer.timeout.connect(self.getBatt)
+        self.timer.timeout.connect(self.getTemp)
+        self.timer.timeout.connect(self.getCurrent)
+        self.timer.timeout.connect(self.getPower)
 
         self.timer.start(1000)
 
-
     def initUI(self):
-        self.setWindowTitle('Absolute')
-        self.setStyleSheet("background-color:grey;")
-        self.setGeometry(200, 100, 900, 500)
-        self.setWindowTitle("my example")
 
-        speedTitle = QLabel("Current Speed", self)
-        newfont = QtGui.QFont("Arial", 36)
-        speedTitle.setFont(newfont)
-        speedTitle.resize(250, 50)
-        speedTitle.move(20, 10)
+        # Labels
+        lbl1 = QLabel("Current Speed", self)
+        lbl1.move(25, 25)
 
-        self.currSpeed = QLabel("speed", self)
-        self.currSpeed.resize(300, 100)
-        self.currSpeed.move(35, 55)
-        self.currSpeed.setStyleSheet("background-color:grey;") #HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 48, QtGui.QFont.Bold)
-        self.currSpeed.setFont(newfont)
+        lbl2 = QLabel("Estimated Range", self)
+        lbl2.move(25, 270)
 
-        rangeTitle = QLabel("Estimated Range", self)
-        newfont = QtGui.QFont("Arial", 28)
-        rangeTitle.setFont(newfont)
-        rangeTitle.resize(250, 50)
-        rangeTitle.move(20, 330)
+        lbl3 = QLabel("Battery Level", self)
+        lbl3.move(280, 230)
 
-        self.currRange = QLabel("range", self)
-        self.currRange.resize(250, 80)
-        self.currRange.move(50, 370)
-        self.currRange.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 32, QtGui.QFont.Bold)
-        self.currRange.setFont(newfont)
+        lbl4 = QLabel("Cabin Temperature", self)
+        lbl4.move(450, 25)
 
-        battTitle = QLabel("Battery Level", self)
-        newfont = QtGui.QFont("Arial", 26)
-        battTitle.setFont(newfont)
-        battTitle.resize(175, 30)
-        battTitle.move(350, 280)
+        lbl5 = QLabel("Motor Current", self)
+        lbl5.move(515, 175)
 
-        self.currBatt = QLabel("battery", self)
-        self.currBatt.resize(170, 70)
-        self.currBatt.move(350, 320)
-        self.currBatt.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 64, QtGui.QFont.Bold)
-        self.currBatt.setFont(newfont)
+        lbl6 = QLabel("Power", self)
+        lbl6.move(600, 320)
 
-        ####PUT BATTERY IMAGE ABOVE BATTERY LEVEL
-        self.battImg = QLabel("🔋", self)
-        self.battImg.resize(100, 100)
-        self.battImg.move(400, 80)
-        self.battImg.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 100, QtGui.QFont.Bold)
-        self.battImg.setFont(newfont)
+        # Values
+        # Note: extra spaces prevent cutoff upon update
+        self.currSpeed = QLabel("0   ", self)
+        self.currSpeed.move(25, 55)
 
-        tempTitle = QLabel("Cabin Temperature", self)
-        newfont = QtGui.QFont("Arial", 26)
-        tempTitle.setFont(newfont)
-        tempTitle.resize(250, 30)
-        tempTitle.move(650, 50)
+        self.currRange = QLabel("0   ", self)
+        self.currRange.move(25, 300)
 
-        self.currTemp = QLabel("temp", self)
-        self.currTemp.resize(100, 42)
-        self.currTemp.move(730, 100)
-        self.currTemp.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 40, QtGui.QFont.Bold)
-        self.currTemp.setFont(newfont)
+        self.currBatt = QLabel("0   ", self)
+        self.currBatt.move(250, 240)
 
-        motorTitle = QLabel("Motor Current", self)
-        newfont = QtGui.QFont("Arial", 26)
-        motorTitle.setFont(newfont)
-        motorTitle.resize(175, 30)
-        motorTitle.move(710, 170)
+        self.currTemp = QLabel("0   ", self)
+        self.currTemp.move(580, 55)
 
-        self.currMotor = QLabel("mc", self)
-        self.currMotor.resize(120, 42)
-        self.currMotor.move(730, 210)
-        self.currMotor.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 40, QtGui.QFont.Bold)
-        self.currMotor.setFont(newfont)
+        self.currCurrent = QLabel("0   ", self)
+        self.currCurrent.move(580, 205)
 
-        powerTitle = QLabel("Power", self)
-        newfont = QtGui.QFont("Arial", 26)
-        powerTitle.setFont(newfont)
-        powerTitle.resize(175, 30)
-        powerTitle.move(730, 280)
+        self.currPower = QLabel("0   ", self)
+        self.currPower.move(580, 350)
 
-        self.currPower = QLabel("power", self)
-        self.currPower.resize(170, 70)
-        self.currPower.move(730, 330)
-        self.currPower.setStyleSheet("background-color:grey;")  # HOW TO SET BACKGROUND COLOR
-        newfont = QtGui.QFont("Arial", 40, QtGui.QFont.Bold)
-        self.currPower.setFont(newfont)
+        # Units
+        speedUnit = QLabel("mph", self)
+        speedUnit.move(175, 150)
+
+        rangeUnit = QLabel("mi.", self)
+        rangeUnit.move(175, 395)
+
+        battUnit = QLabel("%", self)
+        battUnit.move(465, 278)
+
+        tempUnit = QLabel("°F", self)
+        tempUnit.move(660, 92)
+
+        currentUnit = QLabel("A", self)
+        currentUnit.move(660, 242)
+
+        powerUnit = QLabel("W", self)
+        powerUnit.move(660, 387)
+
+        # Configure fonts
+        textFont = QFont("Arial", 20)
+        lbl1.setFont(textFont)
+        lbl2.setFont(textFont)
+        lbl3.setFont(textFont)
+        lbl4.setFont(textFont)
+        lbl5.setFont(textFont)
+        lbl6.setFont(textFont)
+
+        valueFontS = QFont("Arial", 50)
+        valueFontM = QFont("Arial", 100)
+        valueFontL = QFont("Arial", 150)
+        self.currSpeed.setFont(valueFontM)
+        self.currRange.setFont(valueFontM)
+        self.currBatt.setFont(valueFontL)
+        self.currTemp.setFont(valueFontS)
+        self.currCurrent.setFont(valueFontS)
+        self.currPower.setFont(valueFontS)
+
+        unitFont = QFont("Arial", 20)
+        speedUnit.setFont(unitFont)
+        rangeUnit.setFont(unitFont)
+        battUnit.setFont(unitFont)
+        tempUnit.setFont(unitFont)
+        currentUnit.setFont(unitFont)
+        powerUnit.setFont(unitFont)
+
+        # Configure colors
+        textSS = "QLabel { color: gold; }"
+        lbl1.setStyleSheet(textSS)
+        lbl2.setStyleSheet(textSS)
+        lbl3.setStyleSheet(textSS)
+        lbl4.setStyleSheet(textSS)
+        lbl5.setStyleSheet(textSS)
+        lbl6.setStyleSheet(textSS)
+
+        valueSS = "QLabel { color: black; }"
+        self.currSpeed.setStyleSheet(valueSS)
+        self.currRange.setStyleSheet(valueSS)
+        self.currBatt.setStyleSheet(valueSS)
+        self.currTemp.setStyleSheet(valueSS)
+        self.currCurrent.setStyleSheet(valueSS)
+        self.currPower.setStyleSheet(valueSS)
+
+        unitSS = "QLabel { color: black; }"
+        speedUnit.setStyleSheet(valueSS)
+        rangeUnit.setStyleSheet(valueSS)
+        battUnit.setStyleSheet(valueSS)
+        tempUnit.setStyleSheet(valueSS)
+        currentUnit.setStyleSheet(valueSS)
+        powerUnit.setStyleSheet(valueSS)
+
+        # Battery image
+        battMap = QPixmap("batteries/battery24.png")
+        battMap = battMap.scaledToHeight(96)
+        self.batteryImage = QLabel(self)
+        self.batteryImage.setPixmap(battMap)
+        self.batteryImage.move(260, 115)
+
+        # Configure dash color
+        col = QColor(189, 32, 49)  # cardinal
+        # col = QColor(169,169,169)   #grey
+        p = self.palette()
+        p.setColor(self.backgroundRole(), col)
+        self.setPalette(p)
+
+        # Basics
+        self.setGeometry(300, 300, 720, 480)
+        self.setWindowTitle('Solar Car Dash')
+        self.center()
         self.show()
 
-    def setSpeed(self):
-        self.mph += randint(-1, 1) # change to actual data
-        if self.mph < 0:
-            self.mph = 1
-        x = str(self.mph)
-        x += " mph"
-        self.currSpeed.setText(x)
+    def keyPressEvent(self, e):
 
-    def setRange(self):
-        self.range += randint(-1, 0) # change to actual data
-        if self.range < 0:
-            self.range = 0
-        x = str(self.range)
-        x += " mi"
-        self.currRange.setText(x)
+        if e.key() == Qt.Key_Escape:
+            self.close()
 
-    def setBatt(self):
-        self.battery += randint(-1, 0) # change to actual data
-        if self.battery < 0:
-            self.battery = 0
-        x = str(self.battery)
-        x += "%"
-        self.currBatt.setText(x)
+    def center(self):
 
-    def setTemp(self):
-        self.temp += randint(-1, 1) # change to actual data
-        if self.temp < 0:
-            self.temp = 0
-        x = str(self.temp)
-        x += " f"
-        self.currTemp.setText(x)
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
-    def setMotor(self):
-        self.motorCurr += randint(-1, 1) # change to actual data
-        if self.motorCurr < 0:
-            self.motorCurr = 0
-        x = str(self.motorCurr)
-        x += " A"
-        self.currMotor.setText(x)
+    def getSpeed(self):
 
-    def setPower(self):
-        self.power += randint(-1, 0) # change to actual data
-        if self.power < 0:
-            self.power = 0
-        x = str(self.power)
-        x += " W"
-        self.currPower.setText(x)
+        newSpeed = randint(50, 59)
+        self.currSpeed.setText(str(newSpeed))
+
+    def getRange(self):
+
+        newRange = randint(40, 49)
+        self.currRange.setText(str(newRange))
+
+    def getBatt(self):
+
+        newBatt = randint(0, 99)
+        self.currBatt.setText(str(newBatt))
+
+        newMapName = "batteries/battery"
+        if (newBatt <= 0):
+            newMapName += "0.png"
+        elif (newBatt >= 96):
+            newMapName += "24.png"
+        else:
+            newMapName += str(int(newBatt / 100.0 * 24) + 1) + ".png"
+
+        newBattMap = QPixmap(newMapName)
+        newBattMap = newBattMap.scaledToHeight(96)
+        self.batteryImage.setPixmap(newBattMap)
+
+    def getTemp(self):
+
+        newTemp = randint(60, 69)
+        self.currTemp.setText(str(newTemp))
+
+    def getCurrent(self):
+
+        newCurrent = randint(80, 89)
+        self.currCurrent.setText(str(newCurrent))
+
+    def getPower(self):
+
+        newPower = randint(90, 99)
+        self.currPower.setText(str(newPower))
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dash = Dashboard()
-
     sys.exit(app.exec_())
