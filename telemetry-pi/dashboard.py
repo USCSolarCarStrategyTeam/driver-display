@@ -21,70 +21,72 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getCurrent)
         self.timer.timeout.connect(self.getPower)
 
-        self.timer.start(1000)
+        self.timer.start(1000) #every 1 second
 
     def initUI(self):
 
-        # Labels
-        lbl1 = QLabel("Current Speed", self)
-        lbl1.move(25, 25)
+        self.showMaximized();
 
-        lbl2 = QLabel("Estimated Range", self)
-        lbl2.move(25, 270)
+        # Labels
+        lbl1 = QLabel("Speed", self)
+        lbl1.move(20, 20)
+
+        lbl2 = QLabel("Est. Range", self)
+        lbl2.move(20, 260)
 
         lbl3 = QLabel("Battery Level", self)
         lbl3.move(280, 230)
 
-        lbl4 = QLabel("Cabin Temperature", self)
-        lbl4.move(450, 25)
+        lbl4 = QLabel("Cabin Temp", self)
+        lbl4.move(510, 20)
 
         lbl5 = QLabel("Motor Current", self)
-        lbl5.move(515, 175)
+        lbl5.move(490, 170)
 
         lbl6 = QLabel("Power", self)
-        lbl6.move(600, 320)
+        lbl6.move(605, 320)
 
         # Values
         # Note: extra spaces prevent cutoff upon update
         self.currSpeed = QLabel("0   ", self)
-        self.currSpeed.move(25, 55)
+        self.currSpeed.move(20, 55)
 
         self.currRange = QLabel("0   ", self)
-        self.currRange.move(25, 300)
+        self.currRange.move(20, 300)
 
         self.currBatt = QLabel("0   ", self)
         self.currBatt.move(250, 240)
 
         self.currTemp = QLabel("0   ", self)
-        self.currTemp.move(580, 55)
+        self.currTemp.move(575, 55)
 
         self.currCurrent = QLabel("0   ", self)
-        self.currCurrent.move(580, 205)
+        self.currCurrent.move(575, 205)
 
         self.currPower = QLabel("0   ", self)
-        self.currPower.move(580, 350)
+        self.currPower.move(575, 355)
 
         # Units
         speedUnit = QLabel("mph", self)
-        speedUnit.move(175, 150)
+        speedUnit.move(185, 150)
 
         rangeUnit = QLabel("mi.", self)
-        rangeUnit.move(175, 395)
+        rangeUnit.move(185, 395)
 
         battUnit = QLabel("%", self)
-        battUnit.move(465, 278)
+        battUnit.move(485, 278)
 
         tempUnit = QLabel("°F", self)
-        tempUnit.move(660, 92)
+        tempUnit.move(670, 95)
 
         currentUnit = QLabel("A", self)
-        currentUnit.move(660, 242)
+        currentUnit.move(675, 245)
 
         powerUnit = QLabel("W", self)
-        powerUnit.move(660, 387)
+        powerUnit.move(670, 395)
 
         # Configure fonts
-        textFont = QFont("Arial", 20)
+        textFont = QFont("Times", 20, QFont.DemiBold)
         lbl1.setFont(textFont)
         lbl2.setFont(textFont)
         lbl3.setFont(textFont)
@@ -93,8 +95,8 @@ class Dashboard(QWidget):
         lbl6.setFont(textFont)
 
         valueFontS = QFont("Arial", 50)
-        valueFontM = QFont("Arial", 100)
-        valueFontL = QFont("Arial", 150)
+        valueFontM = QFont("Arial", 90)
+        valueFontL = QFont("Arial", 130)
         self.currSpeed.setFont(valueFontM)
         self.currRange.setFont(valueFontM)
         self.currBatt.setFont(valueFontL)
@@ -144,7 +146,7 @@ class Dashboard(QWidget):
 
         # Configure dash color
         col = QColor(189, 32, 49)  # cardinal
-        # col = QColor(169,169,169)   #grey
+        #col = QColor(169,169,169)   #grey
         p = self.palette()
         p.setColor(self.backgroundRole(), col)
         self.setPalette(p)
