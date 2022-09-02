@@ -24,8 +24,8 @@ class Dashboard(QWidget):
         self.timer.start(1000) #every 1 second
 
     def initUI(self):
-
-        self.showMaximized();
+        #for making the dashboard fullscreen on rpi display
+        #self.showMaximized()
 
         # Labels
         lbl1 = QLabel("Speed", self)
