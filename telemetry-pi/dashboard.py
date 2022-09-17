@@ -86,7 +86,7 @@ class Dashboard(QWidget):
         powerUnit.move(670, 395)
 
         # Configure fonts
-        textFont = QFont("Times", 20, QFont.DemiBold)
+        textFont = QFont("Arial", 20, QFont.DemiBold)
         lbl1.setFont(textFont)
         lbl2.setFont(textFont)
         lbl3.setFont(textFont)
