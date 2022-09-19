@@ -24,8 +24,8 @@ class Dashboard(QWidget):
         self.timer.start(1000) #every 1 second
 
     def initUI(self):
-
-        self.showMaximized();
+        #for making the dashboard fullscreen on rpi display
+        #self.showMaximized()
 
         # Labels
         lbl1 = QLabel("Speed", self)
@@ -86,7 +86,7 @@ class Dashboard(QWidget):
         powerUnit.move(670, 395)
 
         # Configure fonts
-        textFont = QFont("Times", 20, QFont.DemiBold)
+        textFont = QFont("Arial", 20, QFont.DemiBold)
         lbl1.setFont(textFont)
         lbl2.setFont(textFont)
         lbl3.setFont(textFont)
