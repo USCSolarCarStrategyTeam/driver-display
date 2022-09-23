@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QFrame,
-                             QColorDialog, QApplication, QLabel, QDesktopWidget)
+                             QColorDialog, QApplication, QLabel, QDesktopWidget, QSplashScreen)
 from PyQt5.QtGui import QColor, QPainter, QFont, QPixmap
 from PyQt5.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
+import time
 
 
 class Dashboard(QWidget):
@@ -21,11 +22,9 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getCurrent)
         self.timer.timeout.connect(self.getPower)
 
-        self.timer.start(1000) #every 1 second
+        self.timer.start(1000)  # every 1 second
 
     def initUI(self):
-        #for making the dashboard fullscreen on rpi display
-        #self.showMaximized()
 
         # Labels
         lbl1 = QLabel("Speed", self)
@@ -146,16 +145,19 @@ class Dashboard(QWidget):
 
         # Configure dash color
         col = QColor(189, 32, 49)  # cardinal
-        #col = QColor(169,169,169)   #grey
+        # col = QColor(169,169,169)   #grey
         p = self.palette()
         p.setColor(self.backgroundRole(), col)
         self.setPalette(p)
 
         # Basics
+        self.setWindowFlag(Qt.FramelessWindowHint)
         self.setGeometry(300, 300, 720, 480)
-        self.setWindowTitle('Solar Car Dash')
         self.center()
-        self.show()
+        # self.setWindowTitle('Solar Car Dash')
+        # self.show()
+        # for making the dashboard fullscreen on rpi display
+        # self.showMaximized()
 
     def keyPressEvent(self, e):
 
@@ -190,7 +192,7 @@ class Dashboard(QWidget):
         elif (newBatt >= 96):
             newMapName += "24.png"
         else:
-            newMapName += str(int(newBatt / 100.0 * 24) + 1) + ".png"
+            newMapName += str((int(newBatt / 100.0 * 12) + 1)*2) + ".png"
 
         newBattMap = QPixmap(newMapName)
         newBattMap = newBattMap.scaledToHeight(96)
@@ -212,7 +214,41 @@ class Dashboard(QWidget):
         self.currPower.setText(str(newPower))
 
 
+def progress():
+    time.sleep(2)
+
+
+class SplashScreen(QSplashScreen):
+    def __init__(self):
+        super(QSplashScreen, self).__init__()
+        self.center()
+        # self.setWindowFlag(Qt.FramelessWindowHint)
+        pixmap = QPixmap("images/blackgradient.jpg")
+        logo_pixmap = QPixmap("images/solar car logo.png")
+        logo = QLabel(self)
+        logo.setPixmap(logo_pixmap)
+        logo.move(245, 125)
+
+        self.setPixmap(pixmap)
+
+    def center(self):
+
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+
+    splash = SplashScreen()
+    splash.show()
+    progress()
+
     dash = Dashboard()
+    dash.show()
+
+    splash.finish(dash)
+
     sys.exit(app.exec_())
