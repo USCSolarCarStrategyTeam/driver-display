@@ -25,12 +25,12 @@ lab2.config(font=("Arial", 44))
 connection = e.getConnection()
 
 if connection == 1:
-    logo = PhotoImage(file="connected.pgm")
+    logo = PhotoImage(file="../images/connected.pgm")
     w1 = Label(root, image=logo, borderwidth=0, highlightthickness=0)
     w1.pack()
 
 else:
-    logo = PhotoImage(file="disconnected2.pgm")
+    logo = PhotoImage(file="../images/disconnected2.pgm")
     w1 = Label(root, image=logo, borderwidth=0, highlightthickness=0)
     w1.pack()
 

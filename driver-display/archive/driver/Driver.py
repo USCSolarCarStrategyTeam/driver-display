@@ -1,6 +1,4 @@
 import IDriver
-import threading
-import time
 
 from random import randint
 
