@@ -22,7 +22,7 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getCurrent)
         self.timer.timeout.connect(self.getPower)
 
-        self.timer.start(1000)  # every 1 second
+        self.timer.start(1000)  # every 1 second,
 
     def initUI(self):
 
