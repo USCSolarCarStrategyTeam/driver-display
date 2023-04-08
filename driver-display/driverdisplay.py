@@ -5,6 +5,7 @@ from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
 import time
+import serial
 
 
 class Dashboard(QWidget):
@@ -192,7 +193,7 @@ class Dashboard(QWidget):
         elif (newBatt >= 96):
             newMapName += "24.png"
         else:
-            newMapName += str((int(newBatt / 100.0 * 12) + 1)*2) + ".png"
+            newMapName += str((int(newBatt / 100.0 * 12) + 1) * 2) + ".png"
 
         newBattMap = QPixmap(newMapName)
         newBattMap = newBattMap.scaledToHeight(96)
@@ -217,7 +218,6 @@ class Dashboard(QWidget):
 def progress():
     time.sleep(2)
 
-
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
@@ -232,7 +232,6 @@ class SplashScreen(QSplashScreen):
         self.setPixmap(pixmap)
 
     def center(self):
-
         qr = self.frameGeometry()
         cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
