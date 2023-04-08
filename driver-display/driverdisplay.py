@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import (QWidget, QPushButton, QFrame,
-                             QColorDialog, QApplication, QLabel, QDesktopWidget, QSplashScreen)
-from PyQt5.QtGui import QColor, QPainter, QFont, QPixmap
-from PyQt5.QtCore import Qt, QTime, QTimer
+from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame,
+                             QColorDialog, QApplication, QLabel, QSplashScreen)
+from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
+from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
 import time
@@ -85,7 +85,7 @@ class Dashboard(QWidget):
         powerUnit.move(670, 395)
 
         # Configure fonts
-        textFont = QFont("Arial", 20, QFont.DemiBold)
+        textFont = QFont("Arial", 20)
         lbl1.setFont(textFont)
         lbl2.setFont(textFont)
         lbl3.setFont(textFont)
@@ -151,23 +151,22 @@ class Dashboard(QWidget):
         self.setPalette(p)
 
         # Basics
-        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setGeometry(300, 300, 720, 480)
         self.center()
         # self.setWindowTitle('Solar Car Dash')
-        # self.show()
         # for making the dashboard fullscreen on rpi display
         # self.showMaximized()
 
     def keyPressEvent(self, e):
 
-        if e.key() == Qt.Key_Escape:
+        if e.key() == Qt.Key.Key_Escape:
             self.close()
 
     def center(self):
 
         qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
+        cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
@@ -215,14 +214,13 @@ class Dashboard(QWidget):
 
 
 def progress():
-    time.sleep(2)
+    time.sleep(1)
 
 
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
         self.center()
-        # self.setWindowFlag(Qt.FramelessWindowHint)
         pixmap = QPixmap("images/blackgradient.jpg")
         logo_pixmap = QPixmap("images/solar car logo.png")
         logo = QLabel(self)
@@ -232,9 +230,8 @@ class SplashScreen(QSplashScreen):
         self.setPixmap(pixmap)
 
     def center(self):
-
         qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
+        cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
@@ -251,4 +248,4 @@ if __name__ == '__main__':
 
     splash.finish(dash)
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
