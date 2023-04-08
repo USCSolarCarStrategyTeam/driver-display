@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame,
-                             QColorDialog, QApplication, QLabel, QSplashScreen)
+from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen)
 from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
+from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
@@ -151,7 +151,7 @@ class Dashboard(QWidget):
         self.setPalette(p)
 
         # Basics
-        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        # self.setWindowFlag(Qt.FramelessWindowHint)
         self.setGeometry(300, 300, 720, 480)
         self.center()
         # self.setWindowTitle('Solar Car Dash')
@@ -166,7 +166,7 @@ class Dashboard(QWidget):
     def center(self):
 
         qr = self.frameGeometry()
-        cp = self.screen().availableGeometry().center()
+        cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
@@ -231,7 +231,7 @@ class SplashScreen(QSplashScreen):
 
     def center(self):
         qr = self.frameGeometry()
-        cp = self.screen().availableGeometry().center()
+        cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
