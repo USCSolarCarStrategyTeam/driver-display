@@ -12,5 +12,5 @@ ser = serial.Serial(
 )
 
 while 1:
-    x=ser.readline()
-    print(x)
+    x = ser.readline()
+    print(x.decode('utf-8'))

@@ -155,13 +155,12 @@ class Dashboard(QWidget):
         self.setGeometry(300, 300, 720, 480)
         self.center()
         # self.setWindowTitle('Solar Car Dash')
-        # self.show()
         # for making the dashboard fullscreen on rpi display
         # self.showMaximized()
 
     def keyPressEvent(self, e):
 
-        if e.key() == Qt.Key_Escape:
+        if e.key() == Qt.Key.Key_Escape:
             self.close()
 
     def center(self):
@@ -215,14 +214,13 @@ class Dashboard(QWidget):
 
 
 def progress():
-    time.sleep(2)
+    time.sleep(1)
 
 
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
         self.center()
-        # self.setWindowFlag(Qt.FramelessWindowHint)
         pixmap = QPixmap("images/blackgradient.jpg")
         logo_pixmap = QPixmap("images/solar car logo.png")
         logo = QLabel(self)
@@ -232,7 +230,6 @@ class SplashScreen(QSplashScreen):
         self.setPixmap(pixmap)
 
     def center(self):
-
         qr = self.frameGeometry()
         cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
