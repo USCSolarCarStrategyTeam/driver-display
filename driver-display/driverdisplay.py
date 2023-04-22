@@ -6,6 +6,7 @@ import sys
 from random import randint
 import time
 import serial
+import asyncio
 
 
 class Dashboard(QWidget):
@@ -236,6 +237,18 @@ class SplashScreen(QSplashScreen):
         cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    async def read_loop(self):
+        ser = serial.Serial
+        while 1:
+            x = ser.readline().decode('utf-8')
+            data = x.split()
+            print(data)
+
+    def data_loop(self):
+        # Set up event loop
+        loop = asyncio.get_event_loop()
+        serial_task = loop.create_task(self.read_loop())
 
 
 if __name__ == '__main__':

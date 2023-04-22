@@ -18,7 +18,14 @@ ser = serial.Serial(
     timeout=1
 )
 
-while 1:
-    x = ser.readline().decode('utf-8')
-    data = x.split()
-    print(x)()
+# while 1:
+x = ser.readline().decode('utf-8')
+data = x.split()
+print(x)
+
+# speed
+if data[0] == 0:
+    speed = data[1]
+# range
+elif data[0] == 1:
+    range = data[1]
