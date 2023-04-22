@@ -8,16 +8,17 @@ import time
 import serial
 import asyncio
 
-speed=0
+speed = 0
+
 
 class Dashboard(QWidget):
-
     speed = 0
     temp = 0
     battery = 0
     current = 0
     power = 0
     range = 0
+
     def __init__(self):
         super(Dashboard, self).__init__()
 
@@ -179,7 +180,6 @@ class Dashboard(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-
     def getSpeed(self):
 
         newSpeed = randint(50, 59)
@@ -193,7 +193,7 @@ class Dashboard(QWidget):
     def getBatt(self):
 
         newBatt = randint(0, 99)
-        self.currBatt.setText(str(newBatt))
+        self.currBatt.setText(str(self.battery))
 
         newMapName = "batteries/battery"
         if (newBatt <= 0):
@@ -224,34 +224,46 @@ class Dashboard(QWidget):
     async def read_loop(self):
         print("hi")
         ser = serial.Serial
-        file = open('test_input.txt')
-        line = file.readLine()
+        file = open('test_input.txt', 'r')
+        line = file.readline()
         while line != '':
             print(line.strip())
-            line = file.readLine()
+            # line = file.readline()
             data = line.split()
-            print(data[0] + " " + data[1])
+            # print("kdfjlsdkfj: " + data[0] + " " + data[1])
+            print("data[0]: " + data[0])
+            print("data[1]: " + data[1])
             if data[0] == 0:
                 self.speed = data[1]
+                print("b" + self.speed)
             # range
-            elif data[0] == 1:
+            elif data[0] == "1":
                 self.range = data[1]
-            elif data[0] == 2:
+                print("e" + self.range)
+            elif data[0] == "2":
                 self.battery = data[1]
-            elif data[0] == 3:
+                print("c" + self.battery)
+            elif data[0] == "3":
                 self.temp = data[1]
-            elif data[0] == 4:
+                print("a" + self.temp)
+            elif data[0] == "4":
                 self.current = data[1]
-            elif data[0] == 5:
+                print("n" + self.current)
+            elif data[0] == "5":
                 self.power = data[1]
-    def data_loop(self):
-        # Set up event loop
-        loop = asyncio.get_event_loop()
-        serial_task = loop.create_task(self.read_loop())
+                print("m" + self.power)
+            progress()
+            line = file.readline()
+
+    # def data_loop(self):
+    #     # Set up event loop
+    #     loop = asyncio.get_event_loop()
+    #     serial_task = loop.create_task(self.read_loop())
 
 
 def progress():
     time.sleep(1)
+
 
 class SplashScreen(QSplashScreen):
     def __init__(self):
@@ -272,20 +284,22 @@ class SplashScreen(QSplashScreen):
         self.move(qr.topLeft())
 
 
-
-
-
-
 if __name__ == '__main__':
+
     app = QApplication(sys.argv)
+    print("hasdfasdfi")
 
     splash = SplashScreen()
     splash.show()
     progress()
-
+    print("asdfadsf")
     dash = Dashboard()
     dash.show()
+    await dash.read_loop()
 
-    splash.finish(dash)
+    print("hi")
+
+    # splash.finish(dash)
+    # dash.read_loop()
 
     sys.exit(app.exec())
