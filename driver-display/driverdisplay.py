@@ -5,6 +5,8 @@ from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
 import time
+import serial
+import asyncio
 
 
 class Dashboard(QWidget):
@@ -191,7 +193,7 @@ class Dashboard(QWidget):
         elif (newBatt >= 96):
             newMapName += "24.png"
         else:
-            newMapName += str((int(newBatt / 100.0 * 12) + 1)*2) + ".png"
+            newMapName += str((int(newBatt / 100.0 * 12) + 1) * 2) + ".png"
 
         newBattMap = QPixmap(newMapName)
         newBattMap = newBattMap.scaledToHeight(96)
@@ -216,7 +218,6 @@ class Dashboard(QWidget):
 def progress():
     time.sleep(1)
 
-
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
@@ -234,6 +235,18 @@ class SplashScreen(QSplashScreen):
         cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    async def read_loop(self):
+        ser = serial.Serial
+        while 1:
+            x = ser.readline().decode('utf-8')
+            data = x.split()
+            print(data)
+
+    def data_loop(self):
+        # Set up event loop
+        loop = asyncio.get_event_loop()
+        serial_task = loop.create_task(self.read_loop())
 
 
 if __name__ == '__main__':
