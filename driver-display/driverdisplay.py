@@ -5,10 +5,13 @@ from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
 from random import randint
 import time
+import threading
 import serial
+
+
 import asyncio
 
-speed = 0
+
 
 
 class Dashboard(QWidget):
@@ -32,7 +35,7 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getCurrent)
         self.timer.timeout.connect(self.getPower)
 
-        self.timer.start(1000)  # every 1 second,
+        self.timer.start(0)  # every 1 second,
 
     def initUI(self):
 
@@ -196,12 +199,12 @@ class Dashboard(QWidget):
         self.currBatt.setText(str(self.battery))
 
         newMapName = "batteries/battery"
-        if (newBatt <= 0):
+        if (int(self.battery) <= 0):
             newMapName += "0.png"
-        elif (newBatt >= 96):
+        elif (int(self.battery) >= 96):
             newMapName += "24.png"
         else:
-            newMapName += str((int(newBatt / 100.0 * 12) + 1) * 2) + ".png"
+            newMapName += str((int( int(self.battery) / 100.0 * 12) + 1) * 2) + ".png"
 
         newBattMap = QPixmap(newMapName)
         newBattMap = newBattMap.scaledToHeight(96)
@@ -221,39 +224,7 @@ class Dashboard(QWidget):
         newPower = randint(90, 99)
         self.currPower.setText(str(self.power))
 
-    async def read_loop(self):
-        print("hi")
-        ser = serial.Serial
-        file = open('test_input.txt', 'r')
-        line = file.readline()
-        while line != '':
-            print(line.strip())
-            # line = file.readline()
-            data = line.split()
-            # print("kdfjlsdkfj: " + data[0] + " " + data[1])
-            print("data[0]: " + data[0])
-            print("data[1]: " + data[1])
-            if data[0] == 0:
-                self.speed = data[1]
-                print("b" + self.speed)
-            # range
-            elif data[0] == "1":
-                self.range = data[1]
-                print("e" + self.range)
-            elif data[0] == "2":
-                self.battery = data[1]
-                print("c" + self.battery)
-            elif data[0] == "3":
-                self.temp = data[1]
-                print("a" + self.temp)
-            elif data[0] == "4":
-                self.current = data[1]
-                print("n" + self.current)
-            elif data[0] == "5":
-                self.power = data[1]
-                print("m" + self.power)
-            progress()
-            line = file.readline()
+
 
     # def data_loop(self):
     #     # Set up event loop
@@ -261,8 +232,15 @@ class Dashboard(QWidget):
     #     serial_task = loop.create_task(self.read_loop())
 
 
-def progress():
-    time.sleep(1)
+
+class start:
+    Dashboard = None
+
+    def __init__(self, dashboard):
+     self.Dashboard = dashboard
+    def progress(self):
+        readthethread = ReadingThread(self.Dashboard)
+        readthethread.start()
 
 
 class SplashScreen(QSplashScreen):
@@ -284,6 +262,75 @@ class SplashScreen(QSplashScreen):
         self.move(qr.topLeft())
 
 
+
+
+
+class ReadingThread(threading.Thread):
+    def __init__(self, dashboard):
+        super(ReadingThread, self).__init__()
+        Dashboard = dashboard
+    def run(self):
+        self.read_loop()
+
+    def read_loop(self):
+        print("hi")
+        file = open('test_input.txt', 'r')
+        line = file.readline()
+        print("dfjdnbf")
+        while line != '':
+            print(line.strip())
+            # line = file.readline()
+            data = line.split()
+            # print("kdfjlsdkfj: " + data[0] + " " + data[1])
+            print("data[0]: " + data[0])
+            print("data[1]: " + data[1])
+
+            if data[0] == "0":
+                self.action(0, data[1])
+            # range
+            elif data[0] == "1":
+
+                self.action(1, data[1])
+            elif data[0] == "2":
+                self.action(2, data[1])
+            elif data[0] == "3":
+                self.action (3, data[1])
+            elif data[0] == "4":
+                self.action(4, data[1])
+            elif data[0] == "5":
+                self.action(5, data[1])
+
+            time.sleep(.5)
+
+            line = file.readline()
+
+    def action(self, number, value):
+        if(number == 0):
+            Dashboard.speed = value
+            print("speed " + value)
+        elif(number == 1):
+            Dashboard.range=value;
+            print("range " + value)
+        elif (number == 2):
+            Dashboard.battery = value
+            print("battery " + value)
+        elif (number == 3):
+            Dashboard.temp = value
+            print("temp " + value)
+        elif (number == 4):
+            Dashboard.current = value
+            print("current " + value)
+        elif(number == 5):
+            Dashboard.power = value
+            print("power " + value)
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -291,13 +338,14 @@ if __name__ == '__main__':
 
     splash = SplashScreen()
     splash.show()
-    progress()
-    print("asdfadsf")
+    print("hi")
     dash = Dashboard()
     dash.show()
-    await dash.read_loop()
 
-    print("hi")
+    starting = start(dash)
+    starting.progress()
+
+
 
     # splash.finish(dash)
     # dash.read_loop()
