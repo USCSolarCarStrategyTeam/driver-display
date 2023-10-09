@@ -1,11 +1,11 @@
-from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen)
+from PyQt6.QtWidgets import (QWidget,QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen,)
 from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
 from PyQt6 import QtGui
-from PyQt6.QtCore import Qt, QTime, QTimer
+from PyQt6.QtCore import Qt, QTime, QTimer, QRectF
 import sys
+import os
 from random import randint
 import time
-
 
 class Dashboard(QWidget):
 
@@ -16,150 +16,129 @@ class Dashboard(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.getSpeed)
-        self.timer.timeout.connect(self.getRange)
-        self.timer.timeout.connect(self.getBatt)
-        self.timer.timeout.connect(self.getTemp)
-        self.timer.timeout.connect(self.getCurrent)
-        self.timer.timeout.connect(self.getPower)
-
-        self.timer.start(1000)  # every 1 second,
+        self.timer.start(500)  # every 1 second,
 
     def initUI(self):
-
-        # Labels
-        lbl1 = QLabel("Speed", self)
-        lbl1.move(20, 20)
-
-        lbl2 = QLabel("Est. Range", self)
-        lbl2.move(20, 260)
-
-        lbl3 = QLabel("Battery Level", self)
-        lbl3.move(280, 230)
-
-        lbl4 = QLabel("Cabin Temp", self)
-        lbl4.move(510, 20)
-
-        lbl5 = QLabel("Motor Current", self)
-        lbl5.move(490, 170)
-
-        lbl6 = QLabel("Power", self)
-        lbl6.move(605, 320)
-
-        # Values
-        # Note: extra spaces prevent cutoff upon update
-        self.currSpeed = QLabel("0   ", self)
-        self.currSpeed.move(20, 55)
-
-        self.currRange = QLabel("0   ", self)
-        self.currRange.move(20, 300)
-
-        self.currBatt = QLabel("0   ", self)
-        self.currBatt.move(250, 240)
-
-        self.currTemp = QLabel("0   ", self)
-        self.currTemp.move(575, 55)
-
-        self.currCurrent = QLabel("0   ", self)
-        self.currCurrent.move(575, 205)
-
-        self.currPower = QLabel("0   ", self)
-        self.currPower.move(575, 355)
-
-        # Units
-        speedUnit = QLabel("mph", self)
-        speedUnit.move(185, 150)
-
-        rangeUnit = QLabel("mi.", self)
-        rangeUnit.move(185, 395)
-
-        battUnit = QLabel("%", self)
-        battUnit.move(485, 278)
-
-        tempUnit = QLabel("°F", self)
-        tempUnit.move(670, 95)
-
-        currentUnit = QLabel("A", self)
-        currentUnit.move(675, 245)
-
-        powerUnit = QLabel("W", self)
-        powerUnit.move(670, 395)
-
-        # Configure fonts
-        textFont = QFont("Arial", 20)
-        lbl1.setFont(textFont)
-        lbl2.setFont(textFont)
-        lbl3.setFont(textFont)
-        lbl4.setFont(textFont)
-        lbl5.setFont(textFont)
-        lbl6.setFont(textFont)
-
-        valueFontS = QFont("Arial", 50)
-        valueFontM = QFont("Arial", 90)
-        valueFontL = QFont("Arial", 130)
-        self.currSpeed.setFont(valueFontM)
-        self.currRange.setFont(valueFontM)
-        self.currBatt.setFont(valueFontL)
-        self.currTemp.setFont(valueFontS)
-        self.currCurrent.setFont(valueFontS)
-        self.currPower.setFont(valueFontS)
-
-        unitFont = QFont("Arial", 20)
-        speedUnit.setFont(unitFont)
-        rangeUnit.setFont(unitFont)
-        battUnit.setFont(unitFont)
-        tempUnit.setFont(unitFont)
-        currentUnit.setFont(unitFont)
-        powerUnit.setFont(unitFont)
-
         # Configure colors
-        textSS = "QLabel { color: gold; }"
-        lbl1.setStyleSheet(textSS)
-        lbl2.setStyleSheet(textSS)
-        lbl3.setStyleSheet(textSS)
-        lbl4.setStyleSheet(textSS)
-        lbl5.setStyleSheet(textSS)
-        lbl6.setStyleSheet(textSS)
+        readingTitleSS = "QLabel { color: gold; }"
+        unitSS = "QLabel { color: grey; }"
+        valueSS = "QLabel { color: white; }"
 
-        valueSS = "QLabel { color: black; }"
-        self.currSpeed.setStyleSheet(valueSS)
-        self.currRange.setStyleSheet(valueSS)
-        self.currBatt.setStyleSheet(valueSS)
-        self.currTemp.setStyleSheet(valueSS)
-        self.currCurrent.setStyleSheet(valueSS)
-        self.currPower.setStyleSheet(valueSS)
+        background = QColor(50, 50, 50)  # dark grey to not blind the driver
 
-        unitSS = "QLabel { color: black; }"
-        speedUnit.setStyleSheet(valueSS)
-        rangeUnit.setStyleSheet(valueSS)
-        battUnit.setStyleSheet(valueSS)
-        tempUnit.setStyleSheet(valueSS)
-        currentUnit.setStyleSheet(valueSS)
-        powerUnit.setStyleSheet(valueSS)
+        # Create Viewport
+        self.setGeometry(0, 0, 720, 480)
+        self.center()
+        self.setWindowTitle('Solar Car Dash')
 
-        # Battery image
-        battMap = QPixmap("batteries/battery24.png")
-        battMap = battMap.scaledToHeight(96)
-        self.batteryImage = QLabel(self)
-        self.batteryImage.setPixmap(battMap)
-        self.batteryImage.move(260, 115)
-
-        # Configure dash color
-        col = QColor(189, 32, 49)  # cardinal
-        # col = QColor(169,169,169)   #grey
+        # setup dashboard background
         p = self.palette()
-        p.setColor(self.backgroundRole(), col)
+        p.setColor(self.backgroundRole(), background)
         self.setPalette(p)
 
-        # Basics
-        # self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setGeometry(300, 300, 720, 480)
-        self.center()
-        # self.setWindowTitle('Solar Car Dash')
-        # for making the dashboard fullscreen on rpi display
-        # self.showMaximized()
+        # Setup Speed display area
 
+        self.speedFrame = QWidget(self)
+        self.speedFrame.setObjectName("speedFrame")
+        self.speedFrame.setGeometry(1, 1, 150, 130)
+        self.speedFrame.setStyleSheet("""
+            #speedFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
+
+        lbl1 = QLabel("Speed", self.speedFrame)
+        lbl1.move(40, 5)
+        lbl1.setFont(QFont("Arial", 20))
+        lbl1.setStyleSheet(readingTitleSS)
+
+        self.speedFrame.currSpeed = QLabel("0   ", self.speedFrame)
+        self.speedFrame.currSpeed.move(40, 40)
+        self.speedFrame.currSpeed.setFont(QFont("Arial", 50))
+        self.speedFrame.currSpeed.setStyleSheet(valueSS)
+
+        speedUnit = QLabel("mph", self.speedFrame)
+        speedUnit.move(115, 110)
+        speedUnit.setFont(QFont("Arial", 12))
+        speedUnit.setStyleSheet(unitSS)
+
+        #speed delta line
+        self.speedFrame.speedDeltaContainer = QWidget(self.speedFrame)
+        speedDeltaContainer = self.speedFrame.speedDeltaContainer
+        speedDeltaContainer.setObjectName("speedDeltaContainer")
+        speedDeltaContainer.setGeometry(10, 15, 20, 103)
+        speedDeltaContainer.setStyleSheet("""
+            #markers {
+                color: white;
+            }
+            #vBar {
+                color: white;
+            }
+            #diamond {
+                color: white;
+            }
+        """)
+
+        speedDeltaContainer.vBar = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.vBar.setObjectName("vBar")
+        speedDeltaContainer.vBar.setGeometry(8, 0, 3, 100)
+        speedDeltaContainer.vBar.setFrameShape(QFrame.Shape.VLine)
+        speedDeltaContainer.vBar.setLineWidth(2)
+
+        speedDeltaContainer.marker1 = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.marker1.setObjectName("markers")
+        speedDeltaContainer.marker1.setGeometry(4, 0, 10, 3)
+        speedDeltaContainer.marker1.setFrameShape(QFrame.Shape.HLine)
+        speedDeltaContainer.marker1.setLineWidth(2)
+
+        speedDeltaContainer.marker2 = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.marker2.setObjectName("markers")
+        speedDeltaContainer.marker2.setGeometry(4, 25, 10, 3)
+        speedDeltaContainer.marker2.setFrameShape(QFrame.Shape.HLine)
+        speedDeltaContainer.marker2.setLineWidth(2)
+
+        speedDeltaContainer.marker3 = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.marker3.setObjectName("markers")
+        speedDeltaContainer.marker3.setGeometry(4, 50, 10, 3)
+        speedDeltaContainer.marker3.setFrameShape(QFrame.Shape.HLine)
+        speedDeltaContainer.marker3.setLineWidth(2)
+
+        speedDeltaContainer.marker4 = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.marker4.setObjectName("markers")
+        speedDeltaContainer.marker4.setGeometry(4, 75, 10, 3)
+        speedDeltaContainer.marker4.setFrameShape(QFrame.Shape.HLine)
+        speedDeltaContainer.marker4.setLineWidth(2)
+
+        speedDeltaContainer.marker5 = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.marker5.setObjectName("markers")
+        speedDeltaContainer.marker5.setGeometry(4, 100, 10, 3)
+        speedDeltaContainer.marker5.setFrameShape(QFrame.Shape.HLine)
+        speedDeltaContainer.marker5.setLineWidth(2)
+
+        # display a square and rotate it 45 degrees to make a diamond
+        speedDeltaContainer.diamond = QFrame(self.speedFrame.speedDeltaContainer)
+        speedDeltaContainer.diamond.setObjectName("diamond")
+        speedDeltaContainer.diamond.setGeometry(4, 46, 10, 10)
+        speedDeltaContainer.diamond.setFrameShape(QFrame.Shape.Box)
+        speedDeltaContainer.diamond.setLineWidth(2)
+        speedDeltaContainer.diamond.setFrameShadow(QFrame.Shadow.Plain)
+
+
+
+
+
+        # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
+        try:
+            if os.environ["FULLSCREEN"] == "1":
+                self.showFullScreen()
+            else :
+                self.show()
+        except:
+            self.show()
+
+    # pressing escape closes the window
     def keyPressEvent(self, e):
-
         if e.key() == Qt.Key.Key_Escape:
             self.close()
 
@@ -172,45 +151,10 @@ class Dashboard(QWidget):
 
     def getSpeed(self):
 
+        # TODO: replace with actual data read from database
+
         newSpeed = randint(50, 59)
-        self.currSpeed.setText(str(newSpeed))
-
-    def getRange(self):
-
-        newRange = randint(40, 49)
-        self.currRange.setText(str(newRange))
-
-    def getBatt(self):
-
-        newBatt = randint(0, 99)
-        self.currBatt.setText(str(newBatt))
-
-        newMapName = "batteries/battery"
-        if (newBatt <= 0):
-            newMapName += "0.png"
-        elif (newBatt >= 96):
-            newMapName += "24.png"
-        else:
-            newMapName += str((int(newBatt / 100.0 * 12) + 1)*2) + ".png"
-
-        newBattMap = QPixmap(newMapName)
-        newBattMap = newBattMap.scaledToHeight(96)
-        self.batteryImage.setPixmap(newBattMap)
-
-    def getTemp(self):
-
-        newTemp = randint(60, 69)
-        self.currTemp.setText(str(newTemp))
-
-    def getCurrent(self):
-
-        newCurrent = randint(80, 89)
-        self.currCurrent.setText(str(newCurrent))
-
-    def getPower(self):
-
-        newPower = randint(90, 99)
-        self.currPower.setText(str(newPower))
+        self.speedFrame.currSpeed.setText(str(newSpeed))
 
 
 def progress():

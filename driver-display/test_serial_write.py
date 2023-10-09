@@ -10,6 +10,6 @@ ser = serial.Serial(
         timeout=1
 )
 
-while 1:
-    x = ser.readline()
-    print(x.decode('utf-8'))
+ser.write('Hello World\n'.encode('utf-8'))
+
+ser.close()
