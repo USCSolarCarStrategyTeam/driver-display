@@ -1,11 +1,14 @@
-from PyQt6.QtWidgets import (QWidget,QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen,)
+from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen, )
 from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, QTime, QTimer, QRectF
 import sys
 import os
-from random import randint
+import random
 import time
+
+updateTime = 1  # seconds
+
 
 class Dashboard(QWidget):
 
@@ -16,9 +19,12 @@ class Dashboard(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.getSpeed)
-        self.timer.start(500)  # every 1 second,
+        self.timer.start(updateTime * 1000)
 
     def initUI(self):
+        #setup variables
+        self.lastSpeed = 0
+
         # Configure colors
         readingTitleSS = "QLabel { color: gold; }"
         unitSS = "QLabel { color: grey; }"
@@ -37,7 +43,6 @@ class Dashboard(QWidget):
         self.setPalette(p)
 
         # Setup Speed display area
-
         self.speedFrame = QWidget(self)
         self.speedFrame.setObjectName("speedFrame")
         self.speedFrame.setGeometry(1, 1, 150, 130)
@@ -63,7 +68,7 @@ class Dashboard(QWidget):
         speedUnit.setFont(QFont("Arial", 12))
         speedUnit.setStyleSheet(unitSS)
 
-        #speed delta line
+        # speed delta line
         self.speedFrame.speedDeltaContainer = QWidget(self.speedFrame)
         speedDeltaContainer = self.speedFrame.speedDeltaContainer
         speedDeltaContainer.setObjectName("speedDeltaContainer")
@@ -116,7 +121,7 @@ class Dashboard(QWidget):
         speedDeltaContainer.marker5.setFrameShape(QFrame.Shape.HLine)
         speedDeltaContainer.marker5.setLineWidth(2)
 
-        # display a square and rotate it 45 degrees to make a diamond
+        # display a square for the speed delta
         speedDeltaContainer.diamond = QFrame(self.speedFrame.speedDeltaContainer)
         speedDeltaContainer.diamond.setObjectName("diamond")
         speedDeltaContainer.diamond.setGeometry(4, 46, 10, 10)
@@ -124,15 +129,11 @@ class Dashboard(QWidget):
         speedDeltaContainer.diamond.setLineWidth(2)
         speedDeltaContainer.diamond.setFrameShadow(QFrame.Shadow.Plain)
 
-
-
-
-
         # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
         try:
             if os.environ["FULLSCREEN"] == "1":
                 self.showFullScreen()
-            else :
+            else:
                 self.show()
         except:
             self.show()
@@ -153,8 +154,31 @@ class Dashboard(QWidget):
 
         # TODO: replace with actual data read from database
 
-        newSpeed = randint(50, 59)
-        self.speedFrame.currSpeed.setText(str(newSpeed))
+        newSpeed = random.uniform(50.0,55.0)
+        self.speedFrame.currSpeed.setText(str(int(newSpeed)))
+
+        acceleration = (newSpeed - self.lastSpeed) / updateTime # mph/s
+
+        self.lastSpeed = newSpeed
+
+        acceleration += 2.0
+        if acceleration > 4.0:
+            acceleration = 4.0
+        elif acceleration < 0.0:
+            acceleration = 0.0
+
+
+        # calculate diamond position
+        # +2mphs = 2 bars up
+        # -2mphs = 2 bars down
+        # 0mphs = center
+        # 1 bar = 25px
+        # +2mphs = 3px absolute
+        # -2mphs = 97px absolute
+        # 0mphs = 50px absolute
+        y = 100.0-(acceleration * 25.0)-4.0
+        self.speedFrame.speedDeltaContainer.diamond.setGeometry(4, int(y), 10, 10)
+
 
 
 def progress():
