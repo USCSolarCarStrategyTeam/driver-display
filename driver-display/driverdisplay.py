@@ -45,7 +45,7 @@ class Dashboard(QWidget):
         # Setup Speed display area
         self.speedFrame = QWidget(self)
         self.speedFrame.setObjectName("speedFrame")
-        self.speedFrame.setGeometry(1, 1, 150, 130)
+        self.speedFrame.setGeometry(0, 0, 150, 130)
         self.speedFrame.setStyleSheet("""
             #speedFrame {
                 border: 2px solid gold;
@@ -53,10 +53,10 @@ class Dashboard(QWidget):
             }
         """)
 
-        lbl1 = QLabel("Speed", self.speedFrame)
-        lbl1.move(40, 5)
-        lbl1.setFont(QFont("Arial", 20))
-        lbl1.setStyleSheet(readingTitleSS)
+        lblSpeed = QLabel("Speed", self.speedFrame)
+        lblSpeed.move(40, 5)
+        lblSpeed.setFont(QFont("Arial", 20))
+        lblSpeed.setStyleSheet(readingTitleSS)
 
         self.speedFrame.currSpeed = QLabel("0   ", self.speedFrame)
         self.speedFrame.currSpeed.move(40, 40)
@@ -129,23 +129,44 @@ class Dashboard(QWidget):
         speedDeltaContainer.diamond.setLineWidth(2)
         speedDeltaContainer.diamond.setFrameShadow(QFrame.Shadow.Plain)
 
-        #Setup Temperature display area
-
+        # Setup Temperature display area
         self.tempFrame = QWidget(self)
         self.tempFrame.setObjectName("tempFrame")
-        self.tempFrame.setGeometry(1, 130, 150, 350)
+        self.tempFrame.setGeometry(0, 130, 150, 350)
         self.tempFrame.setStyleSheet("""
-                    #tempFrame {
-                        border: 2px solid gold;
-                        border-radius: 10px;
-                    }
-                """)
+            #tempFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
 
         lbl1t = QLabel("Temperatures", self.tempFrame)
         lbl1t.move(13, 5)
         lbl1t.setFont(QFont("Arial", 15))
         lbl1t.setStyleSheet(readingTitleSS)
 
+
+        # Setup Power Display Area
+        self.powerFrame = QWidget(self)
+        self.powerFrame.setObjectName("powerFrame")
+        self.powerFrame.setGeometry(520, 0, 200, 480)
+        self.powerFrame.setStyleSheet("""
+            #powerFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
+
+        # Setup Battery Display Area
+        self.batteryFrame = QWidget(self)
+        self.batteryFrame.setObjectName("batteryFrame")
+        self.batteryFrame.setGeometry(150, 380, 370, 100)
+        self.batteryFrame.setStyleSheet("""
+            #batteryFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
 
 
 
