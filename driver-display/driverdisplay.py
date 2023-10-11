@@ -129,6 +129,27 @@ class Dashboard(QWidget):
         speedDeltaContainer.diamond.setLineWidth(2)
         speedDeltaContainer.diamond.setFrameShadow(QFrame.Shadow.Plain)
 
+        #Setup Temperature display area
+
+        self.tempFrame = QWidget(self)
+        self.tempFrame.setObjectName("tempFrame")
+        self.tempFrame.setGeometry(1, 130, 150, 350)
+        self.tempFrame.setStyleSheet("""
+                    #tempFrame {
+                        border: 2px solid gold;
+                        border-radius: 10px;
+                    }
+                """)
+
+        lbl1t = QLabel("Temperatures", self.tempFrame)
+        lbl1t.move(13, 5)
+        lbl1t.setFont(QFont("Arial", 15))
+        lbl1t.setStyleSheet(readingTitleSS)
+
+
+
+
+
         # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
         try:
             if os.environ["FULLSCREEN"] == "1":
