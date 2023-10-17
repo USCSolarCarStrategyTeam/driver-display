@@ -26,27 +26,6 @@ class Dashboard(QWidget):
         self.cabinTempTimer.timeout.connect(self.getCabinTemp)
         self.cabinTempTimer.start(500)  # every second
 
-
-
-    # def __init__(self):
-    #     super(Dashboard, self).__init__()
-    #
-    #     self.initUI()
-    #
-    #     self.motorTempTimer = QTimer()
-    #     self.motorTempTimer.timeout.connect(self.getMotorTemp)
-    #     self.motorTempTimer.start(500) #every second
-    #
-    # def __init__(self):
-    #     super(Dashboard, self).__init__()
-    #
-    #     self.initUI()
-    #
-    #     self.timer = QTimer()
-    #     self.timer.timeout.connect(self.getCabinTemp)
-    #     self.timer.start(500) #every second
-
-
     def initUI(self):
         # Configure colors
         readingTitleSS = "QLabel { color: gold; }"
