@@ -21,6 +21,15 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getSpeed)
         self.timer.start(updateTime * 1000)
 
+        # self.motorTempTimer = QTimer()
+        # self.motorTempTimer.timeout.connect(self.getMotorTemp)
+        # self.motorTempTimer.start(500)
+        #
+        # self.cabinTempTimer = QTimer()
+        # self.cabinTempTimer.timeout.connect(self.getCabinTemp)
+        # self.cabinTempTimer.start(500)
+
+
     def initUI(self):
         #setup variables
         self.lastSpeed = 0
@@ -140,11 +149,42 @@ class Dashboard(QWidget):
             }
         """)
 
-        lbl1t = QLabel("Temperatures", self.tempFrame)
-        lbl1t.move(13, 5)
-        lbl1t.setFont(QFont("Arial", 15))
-        lbl1t.setStyleSheet(readingTitleSS)
+        tempLabel = QLabel("Temperatures", self.tempFrame)
+        tempLabel.move(13, 5)
+        tempLabel.setFont(QFont("Arial", 15))
+        tempLabel.setStyleSheet(readingTitleSS)
 
+        # motor temperature
+        motorTempLabel = QLabel("Motor: ", self.tempFrame)
+        motorTempLabel.move(45, 35)
+        motorTempLabel.setFont(QFont("Arial", 15))
+        motorTempLabel.setStyleSheet(readingTitleSS)
+
+        self.tempFrame.currMotorTemp = QLabel("0   ", self.tempFrame)
+        self.tempFrame.currMotorTemp.move(40, 60)
+        self.tempFrame.currMotorTemp.setFont(QFont("Arial", 30))
+        self.tempFrame.currMotorTemp.setStyleSheet(valueSS)
+
+        motorTempUnit = QLabel("C", self.tempFrame)
+        motorTempUnit.move(115, 80)
+        motorTempUnit.setFont(QFont("Arial", 12))
+        motorTempUnit.setStyleSheet(unitSS)
+
+        # cabin temperature
+        cabinTempLabel = QLabel("Cabin: ", self.tempFrame)
+        cabinTempLabel.move(45, 110)
+        cabinTempLabel.setFont(QFont("Arial", 15))
+        cabinTempLabel.setStyleSheet(readingTitleSS)
+
+        self.tempFrame.currCabinTemp = QLabel("0   ", self.tempFrame)
+        self.tempFrame.currCabinTemp.move(40, 135)
+        self.tempFrame.currCabinTemp.setFont(QFont("Arial", 30))
+        self.tempFrame.currCabinTemp.setStyleSheet(valueSS)
+
+        motorTempUnit = QLabel("C", self.tempFrame)
+        motorTempUnit.move(115, 155)
+        motorTempUnit.setFont(QFont("Arial", 12))
+        motorTempUnit.setStyleSheet(unitSS)
 
         # Setup Power Display Area
         self.powerFrame = QWidget(self)
@@ -167,8 +207,6 @@ class Dashboard(QWidget):
                 border-radius: 10px;
             }
         """)
-
-
 
 
         # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
@@ -221,7 +259,19 @@ class Dashboard(QWidget):
         y = 100.0-(acceleration * 25.0)-4.0
         self.speedFrame.speedDeltaContainer.diamond.setGeometry(4, int(y), 10, 10)
 
+    # def getMotorTemp(self):
 
+       # TODO: replace with actual data
+
+       # newMotorTemp = randint(0, 100)
+       # self.tempFrame.currMotorTemp.setText(str(newMotorTemp))
+
+    # def getCabinTemp(self):
+
+       # TODO: replace with actual data
+
+       # newCabinTemp = randint(0, 100)
+       # self.tempFrame.currCabinTemp.setText(str(newCabinTemp))
 
 def progress():
     time.sleep(1)
