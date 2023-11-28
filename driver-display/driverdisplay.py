@@ -14,17 +14,9 @@ class Dashboard(QWidget):
 
         self.initUI()
 
-        self.speedTimer = QTimer()
-        self.speedTimer.timeout.connect(self.getSpeed)
-        self.speedTimer.start(500)  # every 1 second,
-
-        self.motorTempTimer = QTimer()
-        self.motorTempTimer.timeout.connect(self.getMotorTemp)
-        self.motorTempTimer.start(500) #every second
-
-        self.cabinTempTimer = QTimer()
-        self.cabinTempTimer.timeout.connect(self.getCabinTemp)
-        self.cabinTempTimer.start(500)  # every second
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.getSpeed)
+        self.timer.start(500)  # every 1 second,
 
     def initUI(self):
         # Configure colors
@@ -134,7 +126,6 @@ class Dashboard(QWidget):
 
         #Setup Temperature display area
 
-        #making the temps box
         self.tempFrame = QWidget(self)
         self.tempFrame.setObjectName("tempFrame")
         self.tempFrame.setGeometry(1, 130, 150, 350)
@@ -145,43 +136,14 @@ class Dashboard(QWidget):
                     }
                 """)
 
-        #"Temperatures" label
         lbl1t = QLabel("Temperatures", self.tempFrame)
         lbl1t.move(13, 5)
         lbl1t.setFont(QFont("Arial", 15))
         lbl1t.setStyleSheet(readingTitleSS)
 
-        #motor temperature
-        motorTempLabel = QLabel("Motor: ", self.tempFrame)
-        motorTempLabel.move(45, 35)
-        motorTempLabel.setFont(QFont("Arial", 15))
-        motorTempLabel.setStyleSheet(readingTitleSS)
 
-        self.tempFrame.currMotorTemp = QLabel("0   ", self.tempFrame)
-        self.tempFrame.currMotorTemp.move(40, 60)
-        self.tempFrame.currMotorTemp.setFont(QFont("Arial", 30))
-        self.tempFrame.currMotorTemp.setStyleSheet(valueSS)
 
-        motorTempUnit = QLabel("C", self.tempFrame)
-        motorTempUnit.move(115, 80)
-        motorTempUnit.setFont(QFont("Arial", 12))
-        motorTempUnit.setStyleSheet(unitSS)
 
-        #cabin temperature
-        cabinTempLabel = QLabel("Cabin: ", self.tempFrame)
-        cabinTempLabel.move(45, 110)
-        cabinTempLabel.setFont(QFont("Arial", 15))
-        cabinTempLabel.setStyleSheet(readingTitleSS)
-
-        self.tempFrame.currCabinTemp = QLabel("0   ", self.tempFrame)
-        self.tempFrame.currCabinTemp.move(40, 135)
-        self.tempFrame.currCabinTemp.setFont(QFont("Arial", 30))
-        self.tempFrame.currCabinTemp.setStyleSheet(valueSS)
-
-        motorTempUnit = QLabel("C", self.tempFrame)
-        motorTempUnit.move(115, 155)
-        motorTempUnit.setFont(QFont("Arial", 12))
-        motorTempUnit.setStyleSheet(unitSS)
 
         # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
         try:
@@ -210,22 +172,6 @@ class Dashboard(QWidget):
 
         newSpeed = randint(50, 59)
         self.speedFrame.currSpeed.setText(str(newSpeed))
-
-    def getMotorTemp(self):
-
-        # TODO: replace with actual data
-
-        newMotorTemp = randint(0, 100)
-        self.tempFrame.currMotorTemp.setText(str(newMotorTemp))
-
-    def getCabinTemp(self):
-
-        # TODO: replace with actual data
-
-        newCabinTemp = randint(0, 100)
-        self.tempFrame.currCabinTemp.setText(str(newCabinTemp))
-
-
 
 
 def progress():
