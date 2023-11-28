@@ -1,11 +1,14 @@
-from PyQt6.QtWidgets import (QWidget,QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen,)
+from PyQt6.QtWidgets import (QWidget, QPushButton, QFrame, QColorDialog, QApplication, QLabel, QSplashScreen, )
 from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, QTime, QTimer, QRectF
 import sys
 import os
-from random import randint
+import random
 import time
+
+updateTime = 1  # seconds
+
 
 class Dashboard(QWidget):
 
@@ -16,9 +19,21 @@ class Dashboard(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.getSpeed)
-        self.timer.start(500)  # every 1 second,
+        self.timer.start(updateTime * 1000)
+
+        # self.motorTempTimer = QTimer()
+        # self.motorTempTimer.timeout.connect(self.getMotorTemp)
+        # self.motorTempTimer.start(500)
+        #
+        # self.cabinTempTimer = QTimer()
+        # self.cabinTempTimer.timeout.connect(self.getCabinTemp)
+        # self.cabinTempTimer.start(500)
+
 
     def initUI(self):
+        #setup variables
+        self.lastSpeed = 0
+
         # Configure colors
         readingTitleSS = "QLabel { color: gold; }"
         unitSS = "QLabel { color: grey; }"
@@ -37,10 +52,9 @@ class Dashboard(QWidget):
         self.setPalette(p)
 
         # Setup Speed display area
-
         self.speedFrame = QWidget(self)
         self.speedFrame.setObjectName("speedFrame")
-        self.speedFrame.setGeometry(1, 1, 150, 130)
+        self.speedFrame.setGeometry(0, 0, 150, 130)
         self.speedFrame.setStyleSheet("""
             #speedFrame {
                 border: 2px solid gold;
@@ -48,10 +62,10 @@ class Dashboard(QWidget):
             }
         """)
 
-        lbl1 = QLabel("Speed", self.speedFrame)
-        lbl1.move(40, 5)
-        lbl1.setFont(QFont("Arial", 20))
-        lbl1.setStyleSheet(readingTitleSS)
+        lblSpeed = QLabel("Speed", self.speedFrame)
+        lblSpeed.move(40, 5)
+        lblSpeed.setFont(QFont("Arial", 20))
+        lblSpeed.setStyleSheet(readingTitleSS)
 
         self.speedFrame.currSpeed = QLabel("0   ", self.speedFrame)
         self.speedFrame.currSpeed.move(40, 40)
@@ -63,7 +77,7 @@ class Dashboard(QWidget):
         speedUnit.setFont(QFont("Arial", 12))
         speedUnit.setStyleSheet(unitSS)
 
-        #speed delta line
+        # speed delta line
         self.speedFrame.speedDeltaContainer = QWidget(self.speedFrame)
         speedDeltaContainer = self.speedFrame.speedDeltaContainer
         speedDeltaContainer.setObjectName("speedDeltaContainer")
@@ -116,7 +130,7 @@ class Dashboard(QWidget):
         speedDeltaContainer.marker5.setFrameShape(QFrame.Shape.HLine)
         speedDeltaContainer.marker5.setLineWidth(2)
 
-        # display a square and rotate it 45 degrees to make a diamond
+        # display a square for the speed delta
         speedDeltaContainer.diamond = QFrame(self.speedFrame.speedDeltaContainer)
         speedDeltaContainer.diamond.setObjectName("diamond")
         speedDeltaContainer.diamond.setGeometry(4, 46, 10, 10)
@@ -124,32 +138,82 @@ class Dashboard(QWidget):
         speedDeltaContainer.diamond.setLineWidth(2)
         speedDeltaContainer.diamond.setFrameShadow(QFrame.Shadow.Plain)
 
-        #Setup Temperature display area
-
+        # Setup Temperature display area
         self.tempFrame = QWidget(self)
         self.tempFrame.setObjectName("tempFrame")
-        self.tempFrame.setGeometry(1, 130, 150, 350)
+        self.tempFrame.setGeometry(0, 130, 150, 350)
         self.tempFrame.setStyleSheet("""
-                    #tempFrame {
-                        border: 2px solid gold;
-                        border-radius: 10px;
-                    }
-                """)
+            #tempFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
 
-        lbl1t = QLabel("Temperatures", self.tempFrame)
-        lbl1t.move(13, 5)
-        lbl1t.setFont(QFont("Arial", 15))
-        lbl1t.setStyleSheet(readingTitleSS)
+        tempLabel = QLabel("Temperatures", self.tempFrame)
+        tempLabel.move(13, 5)
+        tempLabel.setFont(QFont("Arial", 15))
+        tempLabel.setStyleSheet(readingTitleSS)
 
+        # motor temperature
+        motorTempLabel = QLabel("Motor: ", self.tempFrame)
+        motorTempLabel.move(45, 35)
+        motorTempLabel.setFont(QFont("Arial", 15))
+        motorTempLabel.setStyleSheet(readingTitleSS)
 
+        self.tempFrame.currMotorTemp = QLabel("0   ", self.tempFrame)
+        self.tempFrame.currMotorTemp.move(40, 60)
+        self.tempFrame.currMotorTemp.setFont(QFont("Arial", 30))
+        self.tempFrame.currMotorTemp.setStyleSheet(valueSS)
 
+        motorTempUnit = QLabel("C", self.tempFrame)
+        motorTempUnit.move(115, 80)
+        motorTempUnit.setFont(QFont("Arial", 12))
+        motorTempUnit.setStyleSheet(unitSS)
+
+        # cabin temperature
+        cabinTempLabel = QLabel("Cabin: ", self.tempFrame)
+        cabinTempLabel.move(45, 110)
+        cabinTempLabel.setFont(QFont("Arial", 15))
+        cabinTempLabel.setStyleSheet(readingTitleSS)
+
+        self.tempFrame.currCabinTemp = QLabel("0   ", self.tempFrame)
+        self.tempFrame.currCabinTemp.move(40, 135)
+        self.tempFrame.currCabinTemp.setFont(QFont("Arial", 30))
+        self.tempFrame.currCabinTemp.setStyleSheet(valueSS)
+
+        motorTempUnit = QLabel("C", self.tempFrame)
+        motorTempUnit.move(115, 155)
+        motorTempUnit.setFont(QFont("Arial", 12))
+        motorTempUnit.setStyleSheet(unitSS)
+
+        # Setup Power Display Area
+        self.powerFrame = QWidget(self)
+        self.powerFrame.setObjectName("powerFrame")
+        self.powerFrame.setGeometry(520, 0, 200, 480)
+        self.powerFrame.setStyleSheet("""
+            #powerFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
+
+        # Setup Battery Display Area
+        self.batteryFrame = QWidget(self)
+        self.batteryFrame.setObjectName("batteryFrame")
+        self.batteryFrame.setGeometry(150, 380, 370, 100)
+        self.batteryFrame.setStyleSheet("""
+            #batteryFrame {
+                border: 2px solid gold;
+                border-radius: 10px;
+            }
+        """)
 
 
         # for making the dashboard fullscreen when env variable for FULLSCREEN is set to 1
         try:
             if os.environ["FULLSCREEN"] == "1":
                 self.showFullScreen()
-            else :
+            else:
                 self.show()
         except:
             self.show()
@@ -170,9 +234,44 @@ class Dashboard(QWidget):
 
         # TODO: replace with actual data read from database
 
-        newSpeed = randint(50, 59)
-        self.speedFrame.currSpeed.setText(str(newSpeed))
+        newSpeed = random.uniform(50.0,55.0)
+        self.speedFrame.currSpeed.setText(str(int(newSpeed)))
 
+        acceleration = (newSpeed - self.lastSpeed) / updateTime # mph/s
+
+        self.lastSpeed = newSpeed
+
+        acceleration += 2.0
+        if acceleration > 4.0:
+            acceleration = 4.0
+        elif acceleration < 0.0:
+            acceleration = 0.0
+
+
+        # calculate diamond position
+        # +2mphs = 2 bars up
+        # -2mphs = 2 bars down
+        # 0mphs = center
+        # 1 bar = 25px
+        # +2mphs = 3px absolute
+        # -2mphs = 97px absolute
+        # 0mphs = 50px absolute
+        y = 100.0-(acceleration * 25.0)-4.0
+        self.speedFrame.speedDeltaContainer.diamond.setGeometry(4, int(y), 10, 10)
+
+    # def getMotorTemp(self):
+
+       # TODO: replace with actual data
+
+       # newMotorTemp = randint(0, 100)
+       # self.tempFrame.currMotorTemp.setText(str(newMotorTemp))
+
+    # def getCabinTemp(self):
+
+       # TODO: replace with actual data
+
+       # newCabinTemp = randint(0, 100)
+       # self.tempFrame.currCabinTemp.setText(str(newCabinTemp))
 
 def progress():
     time.sleep(1)
