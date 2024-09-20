@@ -3,13 +3,15 @@ from PyQt6.QtGui import QColor, QPainter, QFont, QPixmap
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt, QTime, QTimer
 import sys
-from random import randint
 import time
+import can
+
+from can.notifier import MessageRecipient
 
 
 class Dashboard(QWidget):
 
-    def __init__(self):
+    def __init__(self, canbus):
         super(Dashboard, self).__init__()
 
         self.initUI()
@@ -23,6 +25,8 @@ class Dashboard(QWidget):
         self.timer.timeout.connect(self.getPower)
 
         self.timer.start(1000)  # every 1 second,
+
+        self.canbus = canbus
 
     def initUI(self):
 
@@ -172,17 +176,17 @@ class Dashboard(QWidget):
 
     def getSpeed(self):
 
-        newSpeed = randint(50, 59)
+        newSpeed = self.canbus.get_speed()
         self.currSpeed.setText(str(newSpeed))
 
     def getRange(self):
 
-        newRange = randint(40, 49)
+        newRange = self.canbus.get_range()
         self.currRange.setText(str(newRange))
 
     def getBatt(self):
 
-        newBatt = randint(0, 99)
+        newBatt = self.canbus.get_batt()
         self.currBatt.setText(str(newBatt))
 
         newMapName = "batteries/battery"
@@ -199,22 +203,62 @@ class Dashboard(QWidget):
 
     def getTemp(self):
 
-        newTemp = randint(60, 69)
+        newTemp = self.canbus.get_temp()
         self.currTemp.setText(str(newTemp))
 
     def getCurrent(self):
 
-        newCurrent = randint(80, 89)
+        newCurrent = self.canbus.get_current()
         self.currCurrent.setText(str(newCurrent))
 
     def getPower(self):
 
-        newPower = randint(90, 99)
+        newPower = self.canbus.get_power()
         self.currPower.setText(str(newPower))
 
 
 def progress():
     time.sleep(1)
+
+class CanBus():
+    def __init__(self):
+        self.bus = can.interface.Bus(channel='can0', interface='virtual', preserve_timestamps=True)
+        self.speed = 0
+        self.range = 0
+        self.batt = 0
+        self.temp = 0
+        self.current = 0
+        self.power = 0
+
+        self.notifier = can.Notifier(self.bus, [self.on_message_received])
+
+    def on_message_received(self, msg):
+        if msg.arbitration_id == 0x100:
+            self.speed = msg.data[0]
+            self.range = msg.data[1]
+            self.batt = msg.data[2]
+            self.temp = msg.data[3]
+            self.current = msg.data[4]
+            self.power = msg.data[5]
+
+
+    def get_speed(self):
+        return self.speed
+
+    def get_range(self):
+        return self.range
+
+    def get_batt(self):
+        return self.batt
+
+    def get_temp(self):
+        return self.temp
+
+    def get_current(self):
+        return self.current
+
+    def get_power(self):
+        return self.power
 
 
 class SplashScreen(QSplashScreen):
@@ -241,9 +285,12 @@ if __name__ == '__main__':
 
     splash = SplashScreen()
     splash.show()
+
+    canbus = CanBus()
+
     progress()
 
-    dash = Dashboard()
+    dash = Dashboard(canbus)
     dash.show()
 
     splash.finish(dash)
